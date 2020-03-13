@@ -27,8 +27,10 @@ struct Model
     active:     bool
 }
 
-fn model(_ : &App) -> Model
+fn model(app : &App) -> Model
 {
+    app.main_window().set_title("Kerbolar");
+
     println!("Kerbolar");
     println!("--------");
     println!("Cycle through the celestial bodies using the left and right arrow keys; zoom using the scroll wheel.");
@@ -56,7 +58,7 @@ fn event(_ : &App, model : &mut Model, e : Event)
 
                 for _ in 0 .. STEPS_PER_FRAME
                 {
-                    nbody_step(&mut model.celestials, SECONDS_PER_STEP);
+                    nbody_step_euler(&mut model.celestials, SECONDS_PER_STEP);
                 }
 
                 model.frame += 1;
@@ -84,8 +86,8 @@ fn event(_ : &App, model : &mut Model, e : Event)
                         {
                             Some(VirtualKeyCode::P)     => { model.paused    = !model.paused;    println!("Simulation {}.",   if model.paused    { "paused" } else { "unpaused" }) },
                             Some(VirtualKeyCode::H)     => { model.highlight = !model.highlight; println!("Highlighting {}.", if model.highlight { "on"     } else { "off"      }) },
-                            Some(VirtualKeyCode::Left)  => { model.focus = if model.focus == 0 { model.celestials.len() - 1 } else { model.focus - 1 }; println!("Now focussing {}.", model.celestials[model.focus].name) },
-                            Some(VirtualKeyCode::Right) => { model.focus =   (model.focus + 1) % model.celestials.len();                                println!("Now focussing {}.", model.celestials[model.focus].name) },
+                            Some(VirtualKeyCode::Left)  => { model.focus = if model.focus == 0 { model.celestials.len() - 1 } else { model.focus - 1 }; println!("Now focusing {}.", model.celestials[model.focus].name) },
+                            Some(VirtualKeyCode::Right) => { model.focus =   (model.focus + 1) % model.celestials.len();                                println!("Now focusing {}.", model.celestials[model.focus].name) },
                             _                           => ()
                         }
                     }

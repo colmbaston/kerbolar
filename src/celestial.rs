@@ -83,7 +83,7 @@ pub struct StateVectors
     pub velocity: V3<f64>
 }
 
-pub fn nbody_step(celestials : &mut [Celestial], delta_t : f64)
+pub fn nbody_step_euler(celestials : &mut [Celestial], delta_t : f64)
 {
     for i in 0 .. celestials.len()
     {
