@@ -23,7 +23,8 @@ struct Model
     celestials: Vec<Celestial>,
     focus:      usize,
     paused:     bool,
-    highlight:  bool
+    highlight:  bool,
+    active:     bool
 }
 
 fn model(_ : &App) -> Model
@@ -35,7 +36,7 @@ fn model(_ : &App) -> Model
     println!("The simulation is currently paused; press P to toggle the pause state.");
     println!();
 
-    Model { frame: 0, scale: INITIAL_SCALE, celestials: kerbolar_system(), focus: 0, paused: true, highlight: false }
+    Model { frame: 0, scale: INITIAL_SCALE, celestials: kerbolar_system(), focus: 0, paused: true, highlight: false, active: true }
 }
 
 fn event(_ : &App, model : &mut Model, e : Event)
@@ -62,31 +63,44 @@ fn event(_ : &App, model : &mut Model, e : Event)
             }
         },
 
-        Event::DeviceEvent(_, DeviceEvent::MouseWheel { delta: d }) =>
+        Event::DeviceEvent(_, e) =>
         {
-            if let MouseScrollDelta::LineDelta(_, v) = d
+            if model.active
             {
-                model.scale *= match v.partial_cmp(&0.0)
+                if let DeviceEvent::MouseWheel { delta: MouseScrollDelta::LineDelta(_, v) } = e
                 {
-                    Some(Ordering::Less)    => ZOOM,
-                    Some(Ordering::Greater) => ZOOM.recip(),
-                    _                       => 1.0
-                };
+                    model.scale *= match v.partial_cmp(&0.0)
+                    {
+                        Some(Ordering::Less)    => ZOOM,
+                        Some(Ordering::Greater) => ZOOM.recip(),
+                        _                       => 1.0
+                    };
+                }
+                else if let DeviceEvent::Key(k) = e
+                {
+                    if let ElementState::Pressed = k.state
+                    {
+                        match k.virtual_keycode
+                        {
+                            Some(VirtualKeyCode::P)     => { model.paused    = !model.paused;    println!("Simulation {}.",   if model.paused    { "paused" } else { "unpaused" }) },
+                            Some(VirtualKeyCode::H)     => { model.highlight = !model.highlight; println!("Highlighting {}.", if model.highlight { "on"     } else { "off"      }) },
+                            Some(VirtualKeyCode::Left)  => { model.focus = if model.focus == 0 { model.celestials.len() - 1 } else { model.focus - 1 }; println!("Now focussing {}.", model.celestials[model.focus].name) },
+                            Some(VirtualKeyCode::Right) => { model.focus =   (model.focus + 1) % model.celestials.len();                                println!("Now focussing {}.", model.celestials[model.focus].name) },
+                            _                           => ()
+                        }
+                    }
+                }
             }
         },
 
-        Event::DeviceEvent(_, DeviceEvent::Key(k)) =>
+        Event::WindowEvent { id: _, simple: Some(e) } =>
         {
-            if let ElementState::Pressed = k.state
+            match e
             {
-                match k.virtual_keycode
-                {
-                    Some(VirtualKeyCode::P)     => { model.paused    = !model.paused;    println!("Simulation {}.",   if model.paused    { "paused" } else { "unpaused" }) },
-                    Some(VirtualKeyCode::H)     => { model.highlight = !model.highlight; println!("Highlighting {}.", if model.highlight { "on"     } else { "off"      }) },
-                    Some(VirtualKeyCode::Left)  => model.focus  = if model.focus == 0 { model.celestials.len() - 1 } else { model.focus - 1 },
-                    Some(VirtualKeyCode::Right) => model.focus  = (model.focus + 1) % model.celestials.len(),
-                    _                           => ()
-                }
+                WindowEvent::Focused   => model.active = true,
+                WindowEvent::Unfocused => model.active = false,
+                _                      => ()
+
             }
         },
 
@@ -101,7 +115,7 @@ fn view(app : &App, model : &Model, frame : Frame)
 
     let focus_pos = &model.celestials[model.focus].orbit.position;
 
-    for celestial in model.celestials.iter()
+    for celestial in model.celestials.iter().rev()
     {
         let diameter = (2.0 * celestial.radius * model.scale) as f32;
 

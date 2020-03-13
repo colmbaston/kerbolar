@@ -93,11 +93,6 @@ pub fn nbody_step(celestials : &mut [Celestial], delta_t : f64)
             let force_scalar = delta_t * (G * celestials[i].mass * celestials[j].mass) / (distance * distance);
             let force_vector = &celestials[i].orbit.position - &celestials[j].orbit.position;
 
-            if distance < celestials[i].radius + celestials[j].radius
-            {
-                println!("{} and {} have collided!", celestials[i].name, celestials[j].name)
-            }
-
             celestials[i].orbit.velocity = &celestials[i].orbit.velocity - &force_vector.scale_to(force_scalar / celestials[i].mass);
             celestials[j].orbit.velocity = &celestials[j].orbit.velocity + &force_vector.scale_to(force_scalar / celestials[j].mass);
         }
