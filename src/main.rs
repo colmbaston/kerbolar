@@ -113,7 +113,7 @@ fn event(app : &App, model : &mut Model, e : Event)
                 WindowEvent::Unfocused    => model.window.focused = false,
                 WindowEvent::MouseEntered => model.window.mouse   = true,
                 WindowEvent::MouseExited  => model.window.mouse   = false,
-                _                      => ()
+                _                         => ()
 
             }
         },
@@ -151,7 +151,6 @@ fn view(app : &App, model : &Model, frame : Frame)
                 .stroke(Rgb::new(celestial.colour.x, celestial.colour.y, celestial.colour.z));
         }
     }
-
 
     draw.text(&focus.name)
         .rgb(focus.colour.x, focus.colour.y, focus.colour.z)
