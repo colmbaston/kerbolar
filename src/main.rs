@@ -101,7 +101,7 @@ fn event(_ : &App, model : &mut Model, e : Event)
             }
         },
 
-        Event::WindowEvent { id: _, simple: Some(e) } =>
+        Event::WindowEvent { simple: Some(e), .. } =>
         {
             match e
             {
