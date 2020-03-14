@@ -52,7 +52,7 @@ fn model(app : &App) -> Model
     }
 }
 
-fn event(_ : &App, model : &mut Model, e : Event)
+fn event(app : &App, model : &mut Model, e : Event)
 {
     match e
     {
@@ -90,12 +90,14 @@ fn event(_ : &App, model : &mut Model, e : Event)
                 {
                     if let ElementState::Pressed = k.state
                     {
+                        let modifiers = app.keys.mods.bits();
+
                         match k.virtual_keycode
                         {
-                            Some(VirtualKeyCode::P)     => model.paused    = !model.paused,
-                            Some(VirtualKeyCode::H)     => model.highlight = !model.highlight,
-                            Some(VirtualKeyCode::Left)  => model.focus     = (model.focus - 1 + model.celestials.len()) % model.celestials.len(),
-                            Some(VirtualKeyCode::Right) => model.focus     = (model.focus + 1)                          % model.celestials.len(),
+                            Some(VirtualKeyCode::P)     => if modifiers <= 8 { model.paused    = !model.paused    },
+                            Some(VirtualKeyCode::H)     => if modifiers <= 8 { model.highlight = !model.highlight },
+                            Some(VirtualKeyCode::Left)  => if modifiers == 0 { model.focus     = (model.focus - 1 + model.celestials.len()) % model.celestials.len() },
+                            Some(VirtualKeyCode::Right) => if modifiers == 0 { model.focus     = (model.focus + 1)                          % model.celestials.len() },
                             _                           => ()
                         }
                     }
