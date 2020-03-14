@@ -8,7 +8,10 @@ use winit::event::{ DeviceEvent, VirtualKeyCode, ElementState };
 const STEPS_PER_FRAME  : u64 = 360;
 const SECONDS_PER_STEP : f64 = 1.0;
 const DAYS_PER_FRAME   : f64 = STEPS_PER_FRAME as f64 * SECONDS_PER_STEP / 86_400.0;
-const ZOOM             : f64 = 1.1;
+
+const ZOOM_FACTOR      : f64 = 1.1;
+const SCALE_MIN        : f64 = 2.0e-12;
+const SCALE_MAX        : f64 = 1.0e-4;
 
 fn main()
 {
@@ -76,12 +79,12 @@ fn event(app : &App, model : &mut Model, e : Event)
                 {
                     model.scale *= match v.partial_cmp(&0.0)
                     {
-                        Some(Ordering::Less)    => ZOOM,
-                        Some(Ordering::Greater) => ZOOM.recip(),
+                        Some(Ordering::Less)    => ZOOM_FACTOR,
+                        Some(Ordering::Greater) => ZOOM_FACTOR.recip(),
                         _                       => 1.0
                     };
 
-                    model.scale = model.scale.max(2.0e-12).min(1.0e-4);
+                    model.scale = model.scale.max(SCALE_MIN).min(SCALE_MAX);
                 }
             }
             else if model.window.focused
