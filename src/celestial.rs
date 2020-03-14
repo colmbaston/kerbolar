@@ -168,19 +168,21 @@ pub fn kerbolar_system() -> Vec<Celestial>
         orbit:  StateVectors { position: V3::ZERO, velocity: V3::ZERO }
     };
 
+    let moho   = StateVectors::from_keplerian(G * kerbol.mass,  5_263_138_304.0, 0.2,   7.0,    15.0,  70.0, 3.14);
+    let eve    = StateVectors::from_keplerian(G * kerbol.mass,  9_832_684_544.0, 0.01,  2.1,     0.0,  15.0, 3.14);
+    let kerbin = StateVectors::from_keplerian(G * kerbol.mass, 13_599_840_256.0, 0.0,   0.0,     0.0,   0.0, 3.14);
+    let duna   = StateVectors::from_keplerian(G * kerbol.mass, 20_726_155_264.0, 0.051, 0.06,    0.0, 135.5, 3.14);
+    let dres   = StateVectors::from_keplerian(G * kerbol.mass, 40_839_348_203.0, 0.145, 5.0,    90.0, 280.0, 3.14);
+    let jool   = StateVectors::from_keplerian(G * kerbol.mass, 68_773_560_320.0, 0.05,  1.304,   0.0,  52.0, 0.10);
+    let eeloo  = StateVectors::from_keplerian(G * kerbol.mass, 90_118_820_000.0, 0.26,  6.15,  260.0,  50.0, 3.14);
+
     let moho = Celestial
     {
         name:   String::from("Moho"),
         colour: V3 { x: 0.8,  y: 0.4, z: 0.0 },
         mass:   2.526_331_4e21,
         radius: 250_000.0,
-        orbit:  StateVectors::from_keplerian(G * kerbol.mass,
-                                             5_263_138_304.0,
-                                              0.2,
-                                              7.0,
-                                             15.0,
-                                             70.0,
-                                              3.14).relative_to(&kerbol.orbit)
+        orbit:  moho
     };
 
     let eve = Celestial
@@ -189,74 +191,18 @@ pub fn kerbolar_system() -> Vec<Celestial>
         colour: V3 { x: 0.4,  y: 0.3, z: 0.4 },
         mass:   1.224_398_0e23,
         radius: 700_000.0,
-        orbit:  StateVectors::from_keplerian(G * kerbol.mass,
-                                             9_832_684_544.0,
-                                              0.01,
-                                              2.1,
-                                              0.0,
-                                             15.0,
-                                              3.14).relative_to(&kerbol.orbit)
-    };
-
-    let gilly = Celestial
-    {
-        name:   String::from("Gilly"),
-        colour: V3 { x: 0.8,  y: 0.4, z: 0.0 },
-        mass:   1.242_036_3e17,
-        radius: 13_000.0,
-        orbit:  StateVectors::from_keplerian(G * eve.mass,
-                                             31_500_000.0,
-                                              0.55,
-                                             12.0,
-                                             10.0,
-                                             80.0,
-                                              0.9).relative_to(&eve.orbit)
+        orbit:  eve
     };
 
     let kerbin = Celestial
     {
         name:   String::from("Kerbin"),
-        colour: V3 { x: 0.0,  y: 0.5, z: 0.0 },
+        colour: V3 { x: 0.0,  y: 0.75, z: 0.0 },
         mass:   5.291_515_8e22,
         radius: 600_000.0,
-        orbit:  StateVectors::from_keplerian(G * kerbol.mass,
-                                             13_599_840_256.0,
-                                              0.0,
-                                              0.0,
-                                              0.0,
-                                              0.0,
-                                             3.14).relative_to(&kerbol.orbit)
+        orbit:  kerbin
     };
 
-    let mun = Celestial
-    {
-        name:   String::from("Mun"),
-        colour: V3 { x: 0.4,  y: 0.4,   z: 0.4 },
-        mass:   9.759_906_6e20,
-        radius: 200_000.0,
-        orbit:  StateVectors::from_keplerian(G * kerbin.mass,
-                                             12_000_000.0,
-                                             0.0,
-                                             0.0,
-                                             0.0,
-                                             0.0,
-                                             1.7).relative_to(&kerbin.orbit)
-    };
-
-    let minmus = Celestial
-    {
-        name:   String::from("Minmus"),
-        colour: V3 { x: 0.69, y: 0.882, z: 0.808 },
-        mass:   2.645_758_0e19,
-        radius: 60_000.0,
-        orbit:  StateVectors::from_keplerian(G * kerbin.mass,
-                                             47_000_000.0,
-                                              0.0,
-                                              6.0,
-                                             38.0,
-                                             78.0,
-                                              0.9).relative_to(&kerbin.orbit)
-    };
 
     let duna = Celestial
     {
@@ -264,28 +210,7 @@ pub fn kerbolar_system() -> Vec<Celestial>
         colour: V3 { x: 1.0,  y: 0.5, z: 0.0 },
         mass:   4.515_427_0e21,
         radius: 320_000.0,
-        orbit:  StateVectors::from_keplerian(G * kerbol.mass,
-                                             20_726_155_264.0,
-                                             0.051,
-                                             0.06,
-                                             0.0,
-                                             135.5,
-                                             3.14).relative_to(&kerbol.orbit)
-    };
-
-    let ike = Celestial
-    {
-        name:   String::from("Ike"),
-        colour: V3 { x: 0.3, y: 0.3, z: 0.3 },
-        mass:   2.782_161_5e20,
-        radius: 130_000.0,
-        orbit:  StateVectors::from_keplerian(G * duna.mass,
-                                             3_200_000.0,
-                                             0.03,
-                                             0.2,
-                                             0.0,
-                                             0.0,
-                                             1.7).relative_to(&duna.orbit)
+        orbit:  duna
     };
 
     let dres = Celestial
@@ -294,13 +219,7 @@ pub fn kerbolar_system() -> Vec<Celestial>
         colour: V3 { x: 0.6,  y: 0.6, z: 0.6 },
         mass:   3.219_093_7e20,
         radius: 136_000.0,
-        orbit:  StateVectors::from_keplerian(G * kerbol.mass,
-                                             40_839_348_203.0,
-                                             0.145,
-                                             5.0,
-                                             90.0,
-                                             280.0,
-                                             3.14).relative_to(&kerbol.orbit)
+        orbit:  dres
     };
 
     let jool = Celestial
@@ -309,92 +228,7 @@ pub fn kerbolar_system() -> Vec<Celestial>
         colour: V3 { x: 0.0,  y: 0.9, z: 0.0 },
         mass:   4.233_212_7e24,
         radius: 6_000_000.0,
-        orbit:  StateVectors::from_keplerian(G * kerbol.mass,
-                                             68_773_560_320.0,
-                                             0.05,
-                                             1.304,
-                                             0.0,
-                                             52.0,
-                                             0.1).relative_to(&kerbol.orbit)
-    };
-
-    let laythe = Celestial
-    {
-        name:   String::from("Laythe"),
-        colour: V3 { x: 0.0, y: 0.2, z: 0.8 },
-        mass:   2.939_731_1e22,
-        radius: 500_000.0,
-        orbit:  StateVectors::from_keplerian(G * jool.mass,
-                                             27_184_000.0,
-                                             0.0,
-                                             0.0,
-                                             0.0,
-                                             0.0,
-                                             3.14).relative_to(&jool.orbit)
-
-    };
-
-    let vall = Celestial
-    {
-        name:   String::from("Vall"),
-        colour: V3 { x: 0.33, y: 0.412, z: 0.431 },
-        mass:   3.108_765_5e21,
-        radius: 300_000.0,
-        orbit:  StateVectors::from_keplerian(G * jool.mass,
-                                             43_152_000.0,
-                                             0.0,
-                                             0.0,
-                                             0.0,
-                                             0.0,
-                                             0.9).relative_to(&jool.orbit)
-
-    };
-
-    let tylo = Celestial
-    {
-        name:   String::from("Tylo"),
-        colour: V3 { x: 0.6, y: 0.6, z: 0.6 },
-        mass:   4.233_212_7e22,
-        radius: 600_000.0,
-        orbit:  StateVectors::from_keplerian(G * jool.mass,
-                                             68_500_000.0,
-                                             0.0,
-                                             0.025,
-                                             0.0,
-                                             0.0,
-                                             3.14).relative_to(&jool.orbit)
-
-    };
-
-    let bop = Celestial
-    {
-        name:   String::from("Bop"),
-        colour: V3 { x: 0.4, y: 0.333, z: 0.298 },
-        mass:   3.726_109_0e19,
-        radius: 65_000.0,
-        orbit:  StateVectors::from_keplerian(G * jool.mass,
-                                             128_500_000.0,
-                                              0.235,
-                                             15.0,
-                                             25.0,
-                                             10.0,
-                                              0.9).relative_to(&jool.orbit)
-
-    };
-
-    let pol = Celestial
-    {
-        name:   String::from("Pol"),
-        colour: V3 { x: 0.75, y: 0.635, z: 0.463 },
-        mass:   1.081_350_7e19,
-        radius: 44_000.0,
-        orbit:  StateVectors::from_keplerian(G * jool.mass,
-                                             179_890_000.0,
-                                             0.171,
-                                             4.25,
-                                             15.0,
-                                             2.0,
-                                             0.9).relative_to(&jool.orbit)
+        orbit:  jool
     };
 
     let eeloo = Celestial
@@ -403,13 +237,98 @@ pub fn kerbolar_system() -> Vec<Celestial>
         colour: V3 { x: 0.741,  y: 0.776, z: 0.769 },
         mass:   1.114_922_4e21,
         radius: 210_000.0,
-        orbit:  StateVectors::from_keplerian(G * kerbol.mass,
-                                             90_118_820_000.0,
-                                             0.26,
-                                             6.15,
-                                             260.0,
-                                             50.0,
-                                             3.14).relative_to(&kerbol.orbit)
+        orbit:  eeloo
+    };
+
+    let gilly  = StateVectors::from_keplerian(G * eve.mass,     31_500_000.0, 0.55,  12.0,   10.0, 80.0, 0.90).relative_to(&eve.orbit);
+    let mun    = StateVectors::from_keplerian(G * kerbin.mass,  12_000_000.0, 0.0,    0.0,    0.0,  0.0, 1.70).relative_to(&kerbin.orbit);
+    let minmus = StateVectors::from_keplerian(G * kerbin.mass,  47_000_000.0, 0.0,    6.0,   38.0, 78.0, 0.90).relative_to(&kerbin.orbit);
+    let ike    = StateVectors::from_keplerian(G * duna.mass,     3_200_000.0, 0.03,   0.2,    0.0,  0.0, 1.70).relative_to(&duna.orbit);
+    let laythe = StateVectors::from_keplerian(G * jool.mass,    27_184_000.0, 0.0,    0.0,    0.0,  0.0, 3.14).relative_to(&jool.orbit);
+    let vall   = StateVectors::from_keplerian(G * jool.mass,    43_152_000.0, 0.0,    0.0,    0.0,  0.0, 0.90).relative_to(&jool.orbit);
+    let tylo   = StateVectors::from_keplerian(G * jool.mass,    68_500_000.0, 0.0,    0.025,  0.0,  0.0, 3.14).relative_to(&jool.orbit);
+    let bop    = StateVectors::from_keplerian(G * jool.mass,   128_500_000.0, 0.235, 15.0,   25.0, 10.0, 0.90).relative_to(&jool.orbit);
+    let pol    = StateVectors::from_keplerian(G * jool.mass,   179_890_000.0, 0.171, 4.25,   15.0,  2.0, 0.90).relative_to(&jool.orbit);
+
+    let gilly = Celestial
+    {
+        name:   String::from("Gilly"),
+        colour: V3 { x: 0.8,  y: 0.4, z: 0.0 },
+        mass:   1.242_036_3e17,
+        radius: 13_000.0,
+        orbit:  gilly
+    };
+
+    let mun = Celestial
+    {
+        name:   String::from("Mun"),
+        colour: V3 { x: 0.4,  y: 0.4,   z: 0.4 },
+        mass:   9.759_906_6e20,
+        radius: 200_000.0,
+        orbit:  mun
+    };
+
+    let minmus = Celestial
+    {
+        name:   String::from("Minmus"),
+        colour: V3 { x: 0.69, y: 0.882, z: 0.808 },
+        mass:   2.645_758_0e19,
+        radius: 60_000.0,
+        orbit:  minmus
+    };
+
+    let ike = Celestial
+    {
+        name:   String::from("Ike"),
+        colour: V3 { x: 0.3, y: 0.3, z: 0.3 },
+        mass:   2.782_161_5e20,
+        radius: 130_000.0,
+        orbit:  ike
+    };
+
+    let laythe = Celestial
+    {
+        name:   String::from("Laythe"),
+        colour: V3 { x: 0.0, y: 0.2, z: 0.8 },
+        mass:   2.939_731_1e22,
+        radius: 500_000.0,
+        orbit:  laythe
+    };
+
+    let vall = Celestial
+    {
+        name:   String::from("Vall"),
+        colour: V3 { x: 0.33, y: 0.412, z: 0.431 },
+        mass:   3.108_765_5e21,
+        radius: 300_000.0,
+        orbit:  vall
+    };
+
+    let tylo = Celestial
+    {
+        name:   String::from("Tylo"),
+        colour: V3 { x: 0.6, y: 0.6, z: 0.6 },
+        mass:   4.233_212_7e22,
+        radius: 600_000.0,
+        orbit:  tylo
+    };
+
+    let bop = Celestial
+    {
+        name:   String::from("Bop"),
+        colour: V3 { x: 0.4, y: 0.333, z: 0.298 },
+        mass:   3.726_109_0e19,
+        radius: 65_000.0,
+        orbit:  bop
+    };
+
+    let pol = Celestial
+    {
+        name:   String::from("Pol"),
+        colour: V3 { x: 0.75, y: 0.635, z: 0.463 },
+        mass:   1.081_350_7e19,
+        radius: 44_000.0,
+        orbit:  pol
     };
 
     vec![kerbol, moho, eve, gilly, kerbin, mun, minmus, duna, ike, dres, jool, laythe, vall, tylo, bop, pol, eeloo]
