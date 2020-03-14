@@ -79,7 +79,9 @@ fn event(_ : &App, model : &mut Model, e : Event)
                         Some(Ordering::Less)    => ZOOM,
                         Some(Ordering::Greater) => ZOOM.recip(),
                         _                       => 1.0
-                    }
+                    };
+
+                    model.scale = model.scale.max(2.0e-12).min(1.0e-4);
                 }
             }
             else if model.window.focused
