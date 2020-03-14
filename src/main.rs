@@ -5,7 +5,7 @@ use std::cmp::Ordering;
 use nannou::prelude::*;
 use winit::event::{ DeviceEvent, VirtualKeyCode, ElementState };
 
-const STEPS_PER_FRAME  : u64 = 60;
+const STEPS_PER_FRAME  : u64 = 360;
 const SECONDS_PER_STEP : f64 = 1.0;
 const DAYS_PER_FRAME   : f64 = STEPS_PER_FRAME as f64 * SECONDS_PER_STEP / 86_400.0;
 const ZOOM             : f64 = 1.1;
