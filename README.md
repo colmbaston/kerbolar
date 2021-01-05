@@ -2,9 +2,12 @@
 
 This is an n-body gravitational simulation of the [Kerbolar](https://wiki.kerbalspaceprogram.com/wiki/Kerbol) system from [Kerbal Space Program](https://www.kerbalspaceprogram.com/), written in Rust.
 The [Keplerian orbit](https://en.wikipedia.org/wiki/Kepler_orbit) data used to define the trajectories of celestial bodies in the game are converted into [orbital state vectors](https://en.wikipedia.org/wiki/Orbital_state_vectors) that define the initial condition of the system, then the simulation proceeds using the [Euler method](https://en.wikipedia.org/wiki/Euler_method), applying [Newton's law of universal gravitation](https://en.wikipedia.org/wiki/Newton%27s_law_of_universal_gravitation) over sufficiently small time steps.
-I use [Nannou](https://nannou.cc/) for 2D rendering, though the simulation takes place in 3D.
+I use [Nannou](https://nannou.cc/) for 2D rendering, though the simulation actually takes place in 3D.
 
 ![The Joolian System](./jool.png)
+
+Interestingly, the Joolian system as defined in the game is not stable;
+the moon Vall, through several close encounters with the larger moons Laythe and Tylo, is ejected from Jool's sphere of influence within only 25 days of the start of the simulation.
 
 ## Controls
 
