@@ -203,7 +203,6 @@ pub fn kerbolar_system() -> Vec<Celestial>
         orbit:  kerbin
     };
 
-
     let duna = Celestial
     {
         name:   String::from("Duna"),
