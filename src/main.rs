@@ -5,14 +5,6 @@ use std::cmp::Ordering;
 use nannou::prelude::*;
 use winit::event::{ DeviceEvent, VirtualKeyCode, ElementState };
 
-const STEPS_PER_FRAME  : u64 = 360;
-const SECONDS_PER_STEP : f64 = 1.0;
-const DAYS_PER_FRAME   : f64 = STEPS_PER_FRAME as f64 * SECONDS_PER_STEP / 86_400.0;
-
-const ZOOM_FACTOR      : f64 = 1.1;
-const SCALE_MIN        : f64 = 2.0e-12;
-const SCALE_MAX        : f64 = 1.0e-4;
-
 fn main()
 {
     nannou::app(model).event(event).simple_window(view).run();
@@ -20,13 +12,30 @@ fn main()
 
 struct Model
 {
-    frame:      usize,
-    scale:      f64,
+    time:       f64,
+    steps:      u32,
+    speed:      Scale,
+    zoom:       Scale,
     celestials: Vec<Celestial>,
     focus:      usize,
     paused:     bool,
     highlight:  bool,
     window:     WindowState
+}
+
+struct Scale
+{
+    current : f64,
+    min     : f64,
+    max     : f64
+}
+
+impl Scale
+{
+    fn multiply(&mut self, factor : f64)
+    {
+        self.current = (self.current * factor).max(self.min).min(self.max)
+    }
 }
 
 struct WindowState
@@ -41,8 +50,20 @@ fn model(app : &App) -> Model
 
     Model
     {
-        frame:      0,
-        scale:      3.0e-9,
+        time:  0.0,
+        steps: 360,
+        speed: Scale
+        {
+            current: 1.0,
+            min:     360.0.recip(),
+            max:     360.0
+        },
+        zoom: Scale
+        {
+            current: 3.0e-9,
+            min:     2.0e-12,
+            max:     1.0e-4,
+        },
         celestials: kerbolar_system(),
         focus:      0,
         paused:     true,
@@ -63,11 +84,11 @@ fn event(app : &App, model : &mut Model, e : Event)
         {
             if !model.paused
             {
-                for _ in 0 .. STEPS_PER_FRAME
+                for _ in 0 .. model.steps
                 {
-                    nbody_step_euler(&mut model.celestials, SECONDS_PER_STEP);
+                    nbody_step_euler(&mut model.celestials, model.speed.current);
+                    model.time += model.speed.current;
                 }
-                model.frame += 1;
             }
         },
 
@@ -77,14 +98,12 @@ fn event(app : &App, model : &mut Model, e : Event)
             {
                 if model.window.mouse
                 {
-                    model.scale *= match v.partial_cmp(&0.0)
+                    model.zoom.multiply(match v.partial_cmp(&0.0)
                     {
-                        Some(Ordering::Less)    => ZOOM_FACTOR,
-                        Some(Ordering::Greater) => ZOOM_FACTOR.recip(),
+                        Some(Ordering::Less)    => 1.1,
+                        Some(Ordering::Greater) => 1.1.recip(),
                         _                       => 1.0
-                    };
-
-                    model.scale = model.scale.max(SCALE_MIN).min(SCALE_MAX);
+                    })
                 }
             }
             else if model.window.focused
@@ -97,11 +116,15 @@ fn event(app : &App, model : &mut Model, e : Event)
 
                         match k.virtual_keycode
                         {
-                            Some(VirtualKeyCode::P)     => if modifiers <= 8 { model.paused    = !model.paused    },
-                            Some(VirtualKeyCode::H)     => if modifiers <= 8 { model.highlight = !model.highlight },
-                            Some(VirtualKeyCode::Left)  => if modifiers == 0 { model.focus     = (model.focus - 1 + model.celestials.len()) % model.celestials.len() },
-                            Some(VirtualKeyCode::Right) => if modifiers == 0 { model.focus     = (model.focus + 1)                          % model.celestials.len() },
-                            _                           => ()
+                            Some(VirtualKeyCode::P)        => if modifiers <= 8 { model.paused    = !model.paused    },
+                            Some(VirtualKeyCode::H)        => if modifiers <= 8 { model.highlight = !model.highlight },
+                            Some(VirtualKeyCode::Left)     => if modifiers == 0 { model.focus     = (model.focus - 1 + model.celestials.len()) % model.celestials.len() },
+                            Some(VirtualKeyCode::Right)    => if modifiers == 0 { model.focus     = (model.focus + 1)                          % model.celestials.len() },
+                            Some(VirtualKeyCode::Up)       => if modifiers == 0 { model.speed.multiply(1.1)         },
+                            Some(VirtualKeyCode::Down)     => if modifiers == 0 { model.speed.multiply(1.1.recip()) },
+                            Some(VirtualKeyCode::LBracket) => if modifiers <= 8 { model.steps = (model.steps - 10).max(100) },
+                            Some(VirtualKeyCode::RBracket) => if modifiers <= 8 { model.steps =  model.steps + 10           },
+                            _                              => ()
                         }
                     }
                 }
@@ -135,20 +158,20 @@ fn view(app : &App, model : &Model, frame : Frame)
 
     for celestial in model.celestials.iter().rev()
     {
-        let diameter = (2.0 * celestial.radius * model.scale) as f32;
+        let diameter = (2.0 * celestial.radius * model.zoom.current) as f32;
 
         draw.ellipse()
             .rgb(celestial.colour.x, celestial.colour.y, celestial.colour.z)
             .w(diameter.max(0.1))
             .h(diameter.max(0.1))
-            .x_y(((celestial.orbit.position.x - focus_pos.x) * model.scale) as f32, ((celestial.orbit.position.y - focus_pos.y) * model.scale) as f32);
+            .x_y(((celestial.orbit.position.x - focus_pos.x) * model.zoom.current) as f32, ((celestial.orbit.position.y - focus_pos.y) * model.zoom.current) as f32);
 
         if model.highlight && diameter < 1.0
         {
             draw.ellipse()
                 .w(12.0)
                 .h(12.0)
-                .x_y(((celestial.orbit.position.x - focus_pos.x) * model.scale) as f32, ((celestial.orbit.position.y - focus_pos.y) * model.scale) as f32)
+                .x_y(((celestial.orbit.position.x - focus_pos.x) * model.zoom.current) as f32, ((celestial.orbit.position.y - focus_pos.y) * model.zoom.current) as f32)
                 .no_fill()
                 .stroke_weight(0.4)
                 .stroke(Rgb::new(celestial.colour.x, celestial.colour.y, celestial.colour.z));
@@ -157,11 +180,13 @@ fn view(app : &App, model : &Model, frame : Frame)
 
     draw.text(&focus.name)
         .rgb(focus.colour.x, focus.colour.y, focus.colour.z)
-        .x_y(0.0, -(focus.radius * model.scale) as f32 - 15.0);
+        .x_y(0.0, -(focus.radius * model.zoom.current) as f32 - 15.0);
 
-    let top = app.window_rect().top();
-    let day = model.frame as f64 * DAYS_PER_FRAME;
-    draw.text(&format!("Day {}, Hour {}", day as u64, (day.fract() * 24.0) as u64))
+    let top  = app.window_rect().top();
+    let day  = model.time as u64 / 86_400;
+    let hour = model.time as u64 % 86_400 / 3_600;
+
+    draw.text(&format!("Day {}, Hour {:02}", day, hour))
         .color(WHITE)
         .x_y(0.0, top - 20.0);
 
